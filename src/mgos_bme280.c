@@ -161,7 +161,7 @@ static int8_t user_spi_write(uint8_t dev_id, uint8_t reg_addr, uint8_t *reg_data
         memcpy(temp_buff + 2, reg_data + 1, len - 1);
     }
     txn.hd.tx_data = temp_buff;
-    txn.hd.tx_len = len;
+    txn.hd.tx_len = len + 1;
 
     if (!mgos_spi_run_txn(spi, false, &txn)) {
         LOG(LL_INFO, ("user_spi_write: SPI transaction failed"));
@@ -298,30 +298,34 @@ double mgos_bme280_read_temperature(struct mgos_bme280* bme)
 {
     struct bme280_data comp_data;
     int8_t rslt = bme280_get_sensor_data(BME280_TEMP, &comp_data, &bme->dev);
+    double result;
     if (BME280_OK == rslt) {
 #ifdef BME280_FLOAT_ENABLE
+        result = comp_data.temperature;
 #else
-        comp_data.temperature /= 100.0;
+        result = comp_data.temperature / 100.0;
 #endif
     } else {
-        comp_data.temperature = MGOS_BME280_ERROR;
+        result = MGOS_BME280_ERROR;
     }
-    return comp_data.temperature;
+    return result;
 }
 
 double mgos_bme280_read_pressure(struct mgos_bme280* bme)
 {
     struct bme280_data comp_data;
     int8_t rslt = bme280_get_sensor_data(BME280_PRESS, &comp_data, &bme->dev);
+    double result;
     if (BME280_OK == rslt) {
 #ifdef BME280_FLOAT_ENABLE
+        result = comp_data.pressure;
 #else
-        comp_data.pressure /= 100.0;
+        result = comp_data.pressure / 100.0;
 #endif
     } else {
-        comp_data.pressure = MGOS_BME280_ERROR;
+        result = MGOS_BME280_ERROR;
     }
-    return comp_data.pressure;
+    return result;
 }
 
 double mgos_bme280_read_humidity(struct mgos_bme280* bme)
@@ -332,15 +336,17 @@ double mgos_bme280_read_humidity(struct mgos_bme280* bme)
     }
     struct bme280_data comp_data;
     int8_t rslt = bme280_get_sensor_data(BME280_HUM, &comp_data, &bme->dev);
+    double result;
     if (BME280_OK == rslt) {
 #ifdef BME280_FLOAT_ENABLE
+        result=comp_data.humidity;
 #else
-        comp_data.humidity /= 1000.0;
+        result=comp_data.humidity / 1000.0;
 #endif
     } else {
-        comp_data.humidity = MGOS_BME280_ERROR;
+        result = MGOS_BME280_ERROR;
     }
-    return comp_data.humidity;
+    return result;
 }
 
 void mgos_bme280_delete(struct mgos_bme280* bme)
@@ -356,4 +362,39 @@ bool mgos_bme280_is_bme280(struct mgos_bme280* bme)
         return BME280_CHIP_ID == bme->dev.chip_id;
     }
     return false;
+}
+
+/*
+ */
+struct mgos_bme280_data* mgos_bme280_data_create()
+{
+    return calloc(1, sizeof (struct mgos_bme280_data));
+}
+
+/*
+ */
+void mgos_bme280_data_delete(struct mgos_bme280_data* data)
+{
+    if (NULL != data) {
+        free(data);
+    }
+}
+
+double mgos_bme280_data_get_temp(const struct mgos_bme280_data* data)
+{
+    return (NULL != data) ? data->temp : MGOS_BME280_ERROR;
+}
+
+/*
+ */
+double mgos_bme280_data_get_press(const struct mgos_bme280_data* data)
+{
+    return (NULL != data) ? data->press : MGOS_BME280_ERROR;
+}
+
+/*
+ */
+double mgos_bme280_data_get_humid(const struct mgos_bme280_data* data)
+{
+    return (NULL != data) ? data->humid : MGOS_BME280_ERROR;
 }

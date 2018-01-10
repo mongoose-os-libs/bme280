@@ -84,6 +84,31 @@ double mgos_bme280_read_humidity(struct mgos_bme280* bme);
  */
 bool mgos_bme280_is_bme280(struct mgos_bme280* bme);
 
+/*
+ * Creates a `mgos_bme280_data` struct to be used in js
+ */
+struct mgos_bme280_data* mgos_bme280_data_create();
+
+/*
+ * Frees the struct used by js
+ */
+void mgos_bme280_data_delete(struct mgos_bme280_data* data);
+
+/*
+ * Gets the `temp` member of the mgos_bme280_data struct
+ */
+double mgos_bme280_data_get_temp(const struct mgos_bme280_data* data);
+
+/*
+ * Gets the `press` member of the mgos_bme280_data struct
+ */
+double mgos_bme280_data_get_press(const struct mgos_bme280_data* data);
+
+/*
+ * Gets the `humid` member of the mgos_bme280_data struct
+ */
+double mgos_bme280_data_get_humid(const struct mgos_bme280_data* data);
+
 #ifdef __cplusplus
 }
 #endif
