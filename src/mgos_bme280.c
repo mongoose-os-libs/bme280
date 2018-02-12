@@ -330,6 +330,9 @@ double mgos_bme280_read_pressure(struct mgos_bme280* bme)
 
 double mgos_bme280_read_humidity(struct mgos_bme280* bme)
 {
+    if(NULL == bme){
+        return MGOS_BME280_ERROR;
+    }
     /* Check if the device is BMP280*/
     if (BME280_CHIP_ID != bme->dev.chip_id) {
         return 0.0;
