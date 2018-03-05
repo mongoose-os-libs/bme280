@@ -12,9 +12,9 @@ sources:
   
 config_schema:
 #I2C
- - ["i2c.enable", true]
+# - ["i2c.enable", true]
 #SPI
- - ["spi.enable", true]
+# - ["spi.enable", true]
 
 libs:
   - origin: https://github.com/mongoose-os-libs/i2c
