@@ -288,7 +288,7 @@ int8_t mgos_bme280_read(struct mgos_bme280* bme, struct mgos_bme280_data* data)
 #else
         data->temp = comp_data.temperature / 100.0;
         data->press = comp_data.pressure / 100.0;
-        data->humid = comp_data.humidity / 1000.0;
+        data->humid = comp_data.humidity / 1024.0;
 #endif
     }
     return rslt;
@@ -330,7 +330,7 @@ double mgos_bme280_read_pressure(struct mgos_bme280* bme)
 
 double mgos_bme280_read_humidity(struct mgos_bme280* bme)
 {
-    if(NULL == bme){
+    if (NULL == bme) {
         return MGOS_BME280_ERROR;
     }
     /* Check if the device is BMP280*/
@@ -342,9 +342,9 @@ double mgos_bme280_read_humidity(struct mgos_bme280* bme)
     double result;
     if (BME280_OK == rslt) {
 #ifdef BME280_FLOAT_ENABLE
-        result=comp_data.humidity;
+        result = comp_data.humidity;
 #else
-        result=comp_data.humidity / 1000.0;
+        result = comp_data.humidity / 1024.0;
 #endif
     } else {
         result = MGOS_BME280_ERROR;
