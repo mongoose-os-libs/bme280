@@ -173,6 +173,7 @@ static int8_t user_spi_write(uint8_t dev_id, uint8_t reg_addr, uint8_t *reg_data
 
 struct mgos_bme280 {
     struct bme280_dev dev;
+    struct mgos_bme280_stats stats;
 };
 
 static int8_t commonInit(struct mgos_bme280* bme)
@@ -224,6 +225,7 @@ struct mgos_bme280* mgos_bme280_i2c_create(uint8_t addr)
         LOG(LL_INFO, ("Could not allocate mgos_bme280 structure."));
         return NULL;
     }
+    memset(bme, 0, sizeof(struct mgos_bme280));
 
     //initialize the structure
     bme->dev.dev_id = addr;
@@ -254,6 +256,7 @@ struct mgos_bme280* mgos_bme280_spi_create()
         LOG(LL_INFO, ("Could not allocate mgos_bme280 structure."));
         return NULL;
     }
+    memset(bme, 0, sizeof(struct mgos_bme280));
 
     //initialize the structure
     bme->dev.dev_id = 0;
@@ -271,15 +274,37 @@ struct mgos_bme280* mgos_bme280_spi_create()
     return bme;
 }
 
+static int8_t mgos_bme280_get_sensor_data(uint8_t sensor_comp, struct bme280_data *comp_data, struct mgos_bme280 *bme)
+{
+    double start = mg_time();
+
+    if (NULL == bme) {
+        return -1;
+    }
+
+    bme->stats.read++;
+
+    int8_t rslt=bme280_get_sensor_data(sensor_comp, comp_data, &bme->dev);
+
+    if (BME280_OK == rslt) {
+        bme->stats.read_success++;
+        bme->stats.read_success_usecs+=1000000*(mg_time()-start);
+        bme->stats.last_read_time=start;
+    }
+
+    return rslt;
+}
+
 int8_t mgos_bme280_read(struct mgos_bme280* bme, struct mgos_bme280_data* data)
 {
+
     if (NULL == bme) {
         return -1;
     }
     /* Don't try to read humidity if BMP280 */
     uint8_t sensor_comp = (BME280_CHIP_ID == bme->dev.chip_id) ? BME280_ALL : (BME280_PRESS | BME280_TEMP);
     struct bme280_data comp_data;
-    int8_t rslt = bme280_get_sensor_data(sensor_comp, &comp_data, &bme->dev);
+    int8_t rslt = mgos_bme280_get_sensor_data(sensor_comp, &comp_data, bme);
     if (BME280_OK == rslt) {
 #ifdef BME280_FLOAT_ENABLE
         data->temp = comp_data.temperature;
@@ -297,7 +322,7 @@ int8_t mgos_bme280_read(struct mgos_bme280* bme, struct mgos_bme280_data* data)
 double mgos_bme280_read_temperature(struct mgos_bme280* bme)
 {
     struct bme280_data comp_data;
-    int8_t rslt = bme280_get_sensor_data(BME280_TEMP, &comp_data, &bme->dev);
+    int8_t rslt = mgos_bme280_get_sensor_data(BME280_TEMP, &comp_data, bme);
     double result;
     if (BME280_OK == rslt) {
 #ifdef BME280_FLOAT_ENABLE
@@ -314,7 +339,7 @@ double mgos_bme280_read_temperature(struct mgos_bme280* bme)
 double mgos_bme280_read_pressure(struct mgos_bme280* bme)
 {
     struct bme280_data comp_data;
-    int8_t rslt = bme280_get_sensor_data(BME280_PRESS, &comp_data, &bme->dev);
+    int8_t rslt = mgos_bme280_get_sensor_data(BME280_PRESS, &comp_data, bme);
     double result;
     if (BME280_OK == rslt) {
 #ifdef BME280_FLOAT_ENABLE
@@ -338,7 +363,7 @@ double mgos_bme280_read_humidity(struct mgos_bme280* bme)
         return 0.0;
     }
     struct bme280_data comp_data;
-    int8_t rslt = bme280_get_sensor_data(BME280_HUM, &comp_data, &bme->dev);
+    int8_t rslt = mgos_bme280_get_sensor_data(BME280_HUM, &comp_data, bme);
     double result;
     if (BME280_OK == rslt) {
 #ifdef BME280_FLOAT_ENABLE
@@ -400,4 +425,14 @@ double mgos_bme280_data_get_press(const struct mgos_bme280_data* data)
 double mgos_bme280_data_get_humid(const struct mgos_bme280_data* data)
 {
     return (NULL != data) ? data->humid : MGOS_BME280_ERROR;
+}
+
+/*
+ */
+bool mgos_bme280_getStats(struct mgos_bme280 *bme, struct mgos_bme280_stats *stats) {
+  if (!bme || !stats)
+    return false;
+
+  memcpy((void *)stats, (const void *)&bme->stats, sizeof(struct mgos_bme280_stats));
+  return true;
 }
