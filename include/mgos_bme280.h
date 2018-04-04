@@ -6,6 +6,15 @@ extern "C"
 {
 #endif
 struct mgos_bme280;
+struct mgos_bme280_stats {
+  double last_read_time;         // value of mg_time() upon last call to _read()
+  uint32_t read;                 // calls to _read()
+  uint32_t read_success;         // successful _read()
+  uint32_t read_success_cached;  // calls to _read() which were cached
+  // Note: read_errors := read - read_success - read_success_cached
+  double read_success_usecs;     // time spent in successful uncached _read()
+};
+
 
 /*
  * `temp` - temperature in degrees Celsius
@@ -108,6 +117,16 @@ double mgos_bme280_data_get_press(const struct mgos_bme280_data* data);
  * Gets the `humid` member of the mgos_bme280_data struct
  */
 double mgos_bme280_data_get_humid(const struct mgos_bme280_data* data);
+
+/*
+ * Returns the running statistics on the sensor interaction, the user provides
+ * a pointer to a `struct mgos_bme280_stats` object, which is filled in by this
+ * call.
+ *
+ * Upon success, true is returned. Otherwise, false is returned, in which case
+ * the contents of `stats` is undetermined.
+ */
+bool mgos_bme280_getStats(struct mgos_bme280 *bme, struct mgos_bme280_stats *stats);
 
 #ifdef __cplusplus
 }
