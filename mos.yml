@@ -25,5 +25,6 @@ build_vars:
 tags:
   - c
   - c++
+  - docs:drivers:BME280/BMP280
 
 manifest_version: 2017-09-29
