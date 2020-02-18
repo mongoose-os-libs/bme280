@@ -1,6 +1,5 @@
 #include <stdbool.h>
 
-bool mgos_bme280_init()
-{
-    return true;
+bool mgos_bme280_init() {
+  return true;
 }

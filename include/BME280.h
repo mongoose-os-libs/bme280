@@ -2,13 +2,12 @@
 #include "mgos_bme280.h"
 
 class BME280 {
-public:
-
+ public:
   /*
    * Creates the BME280 object for the device with `addr` address
    */
   BME280(uint8_t addr, bool spi = false)
-  : _bme(spi ? mgos_bme280_spi_create() : mgos_bme280_i2c_create(addr)) {
+      : _bme(spi ? mgos_bme280_spi_create() : mgos_bme280_i2c_create(addr)) {
   }
 
   /*
@@ -19,10 +18,10 @@ public:
   }
 
   /*
-   * Reads the temperature, pressure and humidity in the provided `data` structure.
-   * If the device is BMP280, the humidity will be 0.
+   * Reads the temperature, pressure and humidity in the provided `data`
+   * structure. If the device is BMP280, the humidity will be 0.
    */
-  int8_t read(struct mgos_bme280_data& data) {
+  int8_t read(struct mgos_bme280_data &data) {
     return mgos_bme280_read(_bme, &data);
   }
 
@@ -61,7 +60,7 @@ public:
   bool getStats(struct mgos_bme280_stats *stats) {
     return mgos_bme280_getStats(_bme, stats);
   }
-private:
-  struct mgos_bme280* _bme;
-};
 
+ private:
+  struct mgos_bme280 *_bme;
+};
