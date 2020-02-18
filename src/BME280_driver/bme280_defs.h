@@ -114,6 +114,10 @@
 
 /**\name BME280 chip identifier */
 #define BME280_CHIP_ID                    UINT8_C(0x60)
+/* nliviu - BMP280 chip identifiers */
+#define BMP280_CHIP_ID1  UINT8_C(0x56)
+#define BMP280_CHIP_ID2  UINT8_C(0x57)
+#define BMP280_CHIP_ID3  UINT8_C(0x58)
 
 /**\name Register Address */
 #define BME280_CHIP_ID_ADDR               UINT8_C(0xD0)
