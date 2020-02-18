@@ -313,8 +313,12 @@ int8_t mgos_bme280_read(struct mgos_bme280 *bme,
     data->humid = comp_data.humidity;
 #else
     data->temp = comp_data.temperature / 100.0;
-    data->press = comp_data.pressure / 100.0;
     data->humid = comp_data.humidity / 1024.0;
+#ifdef BME280_64BIT_ENABLE
+    data->press = comp_data.pressure / 100.0;
+#else
+    data->press = comp_data.pressure;
+#endif
 #endif
   }
   return rslt;
@@ -344,7 +348,11 @@ double mgos_bme280_read_pressure(struct mgos_bme280 *bme) {
 #ifdef BME280_FLOAT_ENABLE
     result = comp_data.pressure;
 #else
+#ifdef BME280_64BIT_ENABLE
     result = comp_data.pressure / 100.0;
+#else
+    result = comp_data.pressure;
+#endif
 #endif
   } else {
     result = MGOS_BME280_ERROR;
