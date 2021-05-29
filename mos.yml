@@ -17,8 +17,8 @@ config_schema:
 # - ["spi.enable", true]
 
 libs:
-  - origin: https://github.com/mongoose-os-libs/i2c
-  - origin: https://github.com/mongoose-os-libs/spi
+  - location: https://github.com/mongoose-os-libs/i2c
+  - location: https://github.com/mongoose-os-libs/spi
   
 cdefs:
 # Using 32 bit integer calculation by default
